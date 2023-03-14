@@ -95,7 +95,7 @@ def get_results(n_clicks,url,n_pages):
 
 
                 )
-            rew_output=[html.P(' Select rows and you will get some insights. (if you want to scrape again, refresh the page. Button has blocked trying to avoid external blocking)'),reviews_data_table]
+            rew_output=[html.P(' Select rows and you will get some insights.'),html.P('if you want to scrape again, refresh the page. Button has been disabled trying to avoid external blocking)'),reviews_data_table]
             btn_state=True
         except:
             rew_output="something's wrong, make sure this is a yelp link or we have to wait a little bit."
