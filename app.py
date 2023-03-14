@@ -18,7 +18,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets,suppress_callback_exceptions=True)
 
 scrapper=yelp_scrapper()
-
+server=app.server
 # app layout
 app.layout=html.Div([
     html.Div([
