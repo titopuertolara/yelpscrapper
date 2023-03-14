@@ -1,5 +1,5 @@
 pandas
-cytoscape
+dash-cytoscape
 dash
 beautifulsoup4
 nltk
