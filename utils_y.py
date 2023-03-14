@@ -9,7 +9,7 @@ import re
 import nltk
 import pandas as pd
 import dash_cytoscape as cyto
-from pytube import YouTube
+
 from PIL import Image
 from wordcloud import WordCloud
 import base64
