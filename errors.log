@@ -1,0 +1,14 @@
+Dash is running on http://144.202.88.213:8050/
+
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://144.202.88.213:8050
+Press CTRL+C to quit
+190.131.238.146 - - [14/Mar/2023 20:25:54] "GET / HTTP/1.1" 200 -
+190.131.238.146 - - [14/Mar/2023 20:25:55] "GET /_dash-layout HTTP/1.1" 200 -
+190.131.238.146 - - [14/Mar/2023 20:25:55] "GET /_dash-dependencies HTTP/1.1" 200 -
+190.131.238.146 - - [14/Mar/2023 20:25:55] "GET /_favicon.ico?v=2.8.1 HTTP/1.1" 200 -
+190.131.238.146 - - [14/Mar/2023 20:25:55] "POST /_dash-update-component HTTP/1.1" 200 -
+190.131.238.146 - - [14/Mar/2023 20:25:55] "GET /_dash-component-suites/dash/dcc/async-dropdown.js HTTP/1.1" 304 -
+190.131.238.146 - - [14/Mar/2023 20:25:56] "POST /_dash-update-component HTTP/1.1" 200 -

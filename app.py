@@ -136,7 +136,6 @@ def show_insights(table_index,stored_reviews):
 
 
 
-# this callback triggers kmodes algorithm
 
 
 
