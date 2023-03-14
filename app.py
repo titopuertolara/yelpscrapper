@@ -7,7 +7,7 @@ import plotly.express as  px
 
 import numpy as np
 import math
-from utils_y import yelp_scrapper
+from utils_y import yelp_scrapper,make_graph
 
 
 
@@ -22,14 +22,26 @@ scrapper=yelp_scrapper()
 # app layout
 app.layout=html.Div([
     html.Div([
+        html.H2('Yelp Scraper with dash'),
+        html.H4('Please use it with academic purposes'),
+        html.H5('Put a yelp url and you will get a table with reviews and score. Max aprox. 100 reviews per link. Select rows and you will get some insights.'),
         html.Div(id='url-div',children=[dcc.Input(id='yelp-url'
             ,placeholder='eg: https://www.yelp.com/biz/applebees-grill-bar-san-francisco'
             ,style={'width':'100%'})],style={'width':'40%','display':'inline-block'}),
         html.Div([dcc.Dropdown(id='n-pages',options=[{'label':str(i)+' pages','value':i} for i in range(1,11)],value=1)]
             ,style={'width':'10%','display':'inline-block','position':'absolute','margin-left':'1%'}),
-         html.Div([html.Button('Scrap!',id='scrp-btn',n_clicks=0)],style={'display':'inline-block','margin-left':'12%'}),
-        dcc.Loading(id='table-loading',children=[html.Div(id='scrapper-results')],type='circle',style={'margin-top':'20%'}),
-        html.Div(id='dummy-div'),
+        html.Div([html.Button('Scrap!',id='scrp-btn',n_clicks=0)],style={'display':'inline-block','margin-left':'12%'}),
+        
+        
+        html.Div(id='sub_block_1',children=[
+            dcc.Loading(id='graph-load',children=[html.Div(id='graph-div')]),
+            dcc.Loading(id='wprd-load',children=[html.Div(id='wordcloud-div',style={'margin-left':'50%','margin-top':'-24%','position':'absolute'})])
+        ]),
+        dcc.Loading(id='table-loading',children=[html.Div(id='scrapper-results')]
+            ,type='circle'
+            ,style={'margin-top':'1%'}
+            ),
+       
         dcc.Store(id='reviews-store')
 
     ])
@@ -83,13 +95,26 @@ def get_results(n_clicks,url,n_pages):
 
      return reviews_data_table,reviews.to_json()
     
-@app.callback(Output('dummy-div','children'),
+@app.callback(Output('graph-div','children'),
+              Output('wordcloud-div','children'),
               [Input({'type':'datatable','index':ALL},'derived_virtual_selected_rows'),
               Input('reviews-store','data')])  
 def show_insights(table_index,stored_reviews):
-    reviews_df=pd.read_json(stored_reviews)
-    print(reviews_df)
-    return ''
+    graph_result=''
+    wc_html_img=''
+    try:
+        reviews_df=pd.read_json(stored_reviews)
+        text_review=reviews_df.loc[table_index[0][0],'Review']
+        print(text_review)
+        graphobj=make_graph(text_review)
+        final_content_list=graphobj.clean()
+        net_style='concentric'
+        graph_result=graphobj.render_graph(final_content_list,net_style)
+        wc_html_img=graphobj.render_word_cloud(final_content_list)
+    except Exception as e:
+        print(e)
+        
+    return graph_result,wc_html_img
 
 
 
