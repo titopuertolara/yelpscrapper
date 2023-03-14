@@ -1,7 +1,7 @@
 from dash import Dash, dcc, html, Input, Output,State,ctx, dash_table,ALL
 import os
 import pandas as pd
-from kmodes.kmodes import KModes
+
 import plotly.graph_objects as go
 import plotly.express as  px
 
