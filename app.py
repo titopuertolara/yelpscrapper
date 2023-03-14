@@ -52,6 +52,7 @@ app.layout=html.Div([
 @app.callback(Output('scrapper-results','children'),
               Output('reviews-store','data'),
               Output('dummy-loader-div','children'),
+              Output('scrp-btn','disabled'),
                 [Input('scrp-btn','n_clicks'),
                 State('yelp-url','value'),
                 State('n-pages','value')])
@@ -60,6 +61,7 @@ def get_results(n_clicks,url,n_pages):
      rew_output=""
      dummy_out=''
      reviews=pd.DataFrame()
+     btn_state=False
      if 'scrp-btn'==ctx.triggered_id:
         #print(url,n_pages)
         n_pages=int(n_pages)
@@ -93,13 +95,14 @@ def get_results(n_clicks,url,n_pages):
 
 
                 )
-            rew_output=[html.P(' Select rows and you will get some insights.'),reviews_data_table]
+            rew_output=[html.P(' Select rows and you will get some insights. (if you want to scrape again, refresh the page. Button has blocked trying to avoid external blocking)'),reviews_data_table]
+            btn_state=True
         except:
-            rew_output="something's wrong, make sure this is a yelp link"
+            rew_output="something's wrong, make sure this is a yelp link or we have to wait a little bit."
 
 
 
-     return rew_output,reviews.to_json(),dummy_out
+     return rew_output,reviews.to_json(),dummy_out,btn_state
     
 @app.callback(Output('graph-div','children'),
               Output('wordcloud-div','children'),
