@@ -1,0 +1,6 @@
+pandas
+cytoscape
+dash
+beautifulsoup4
+nltk
+wordcloud
