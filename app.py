@@ -18,24 +18,26 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets,suppress_callback_exceptions=True)
 server=app.server
 scrapper=yelp_scrapper()
-
+graphic_stars={'1':'⭐','2':'⭐⭐','3':'⭐⭐⭐','4':'⭐⭐⭐⭐','5':'⭐⭐⭐⭐⭐'}
 # app layout
 app.layout=html.Div([
     html.Div([
         html.H2('Yelp Scraper with dash'),
         html.H4('Please use it with academic purposes'),
-        html.H5('Put a yelp url and you will get a table with reviews and score. Max aprox. 100 reviews per link. Select rows and you will get some insights.'),
+        html.H5('Put a yelp url and you will get a table with reviews and score. Max aprox. 100 reviews per link.'),
         html.Div(id='url-div',children=[dcc.Input(id='yelp-url'
             ,placeholder='eg: https://www.yelp.com/biz/applebees-grill-bar-san-francisco'
             ,style={'width':'100%'})],style={'width':'40%','display':'inline-block'}),
         html.Div([dcc.Dropdown(id='n-pages',options=[{'label':str(i)+' pages','value':i} for i in range(1,11)],value=1)]
             ,style={'width':'10%','display':'inline-block','position':'absolute','margin-left':'1%'}),
         html.Div([html.Button('Scrap!',id='scrp-btn',n_clicks=0)],style={'display':'inline-block','margin-left':'12%'}),
+        html.Div(dcc.Loading(id='dummy-loader',children=[html.Div(id='dummy-loader-div')]),style={'display':'inline-block','margin-left':'15%'}),
         
         
         html.Div(id='sub_block_1',children=[
             dcc.Loading(id='graph-load',children=[html.Div(id='graph-div')]),
-            dcc.Loading(id='wprd-load',children=[html.Div(id='wordcloud-div',style={'margin-left':'50%','margin-top':'-24%','position':'absolute'})])
+            dcc.Loading(id='wprd-load',children=[html.Div(id='wordcloud-div',style={'margin-left':'50%','margin-top':'-35%','position':'absolute'})]),
+            dcc.Loading(id='text-load',children=[html.Div(id='text-review',style={'margin-left':'50%','margin-top':'-19%','position':'absolute','overflow':'scroll','height':'50%'})])
         ]),
         dcc.Loading(id='table-loading',children=[html.Div(id='scrapper-results')]
             ,type='circle'
@@ -49,12 +51,14 @@ app.layout=html.Div([
 
 @app.callback(Output('scrapper-results','children'),
               Output('reviews-store','data'),
+              Output('dummy-loader-div','children'),
                 [Input('scrp-btn','n_clicks'),
                 State('yelp-url','value'),
                 State('n-pages','value')])
 def get_results(n_clicks,url,n_pages):
 
-     reviews_data_table=""
+     rew_output=""
+     dummy_out=''
      reviews=pd.DataFrame()
      if 'scrp-btn'==ctx.triggered_id:
         #print(url,n_pages)
@@ -87,34 +91,44 @@ def get_results(n_clicks,url,n_pages):
                                     ],
                                     row_selectable="single"
 
+
                 )
+            rew_output=[html.P(' Select rows and you will get some insights.'),reviews_data_table]
         except:
-            reviews_data_table="something's wrong, make sure this is a yelp link"
+            rew_output="something's wrong, make sure this is a yelp link"
 
 
 
-     return reviews_data_table,reviews.to_json()
+     return rew_output,reviews.to_json(),dummy_out
     
 @app.callback(Output('graph-div','children'),
               Output('wordcloud-div','children'),
+              Output('text-review','children'),
+              Output('text-review','style'),
               [Input({'type':'datatable','index':ALL},'derived_virtual_selected_rows'),
               Input('reviews-store','data')])  
 def show_insights(table_index,stored_reviews):
     graph_result=''
     wc_html_img=''
+    text_review=''
+    test_review_style={'display':'none'}
     try:
         reviews_df=pd.read_json(stored_reviews)
+        
+        stars=reviews_df.loc[table_index[0][0],'Rating'].split()[0]
         text_review=reviews_df.loc[table_index[0][0],'Review']
         print(text_review)
         graphobj=make_graph(text_review)
         final_content_list=graphobj.clean()
+        text_review+=graphic_stars[stars]
         net_style='concentric'
         graph_result=graphobj.render_graph(final_content_list,net_style)
         wc_html_img=graphobj.render_word_cloud(final_content_list)
+        test_review_style={'margin-left':'50%','margin-top':'-19%','position':'absolute','overflow':'scroll','height':'50%'}
     except Exception as e:
         print(e)
-        
-    return graph_result,wc_html_img
+    
+    return graph_result,wc_html_img,text_review,test_review_style
 
 
 
