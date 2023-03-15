@@ -8,8 +8,7 @@ import plotly.express as  px
 import numpy as np
 import math
 from utils_y import yelp_scrapper,make_graph
-
-
+import random 
 
 
 
@@ -22,6 +21,7 @@ graphic_stars={'1':'⭐','2':'⭐⭐','3':'⭐⭐⭐','4':'⭐⭐⭐⭐','5':'�
 # app layout
 app.layout=html.Div([
     html.Div([
+        
         html.H2('Yelp Scraper with dash'),
         html.H4('Please use it with academic purposes'),
         html.H5('Put a yelp url and you will get a table with reviews and score. Max aprox. 100 reviews per link.'),
@@ -30,7 +30,8 @@ app.layout=html.Div([
             ,style={'width':'100%'})],style={'width':'40%','display':'inline-block'}),
         html.Div([dcc.Dropdown(id='n-pages',options=[{'label':str(i)+' pages','value':i} for i in range(1,11)],value=1)]
             ,style={'width':'10%','display':'inline-block','position':'absolute','margin-left':'1%'}),
-        html.Div([html.Button('Scrap!',id='scrp-btn',n_clicks=0)],style={'display':'inline-block','margin-left':'12%'}),
+        html.Div(dcc.Input(id='captcha',type='text'),style={'width':'10%','display':'inline-block','margin-left':'13%'}),
+        html.Div([html.Button('Scrap!',id='scrp-btn',n_clicks=0)],style={'display':'inline-block','margin-left':'8%'}),
         html.Div(dcc.Loading(id='dummy-loader',children=[html.Div(id='dummy-loader-div')]),style={'display':'inline-block','margin-left':'15%'}),
         
         
@@ -44,10 +45,21 @@ app.layout=html.Div([
             ,style={'margin-top':'1%'}
             ),
        
-        dcc.Store(id='reviews-store')
+        dcc.Store(id='reviews-store'),
+        dcc.Interval(id='captcha-refresh',interval=20000,n_intervals=0),
+        dcc.Store(id='captcha-gen')
 
     ])
 ])
+
+@app.callback(Output('captcha','placeholder'),
+              Output('captcha-gen','data'),
+              [Input('captcha-refresh','n_intervals')])
+def captcha_show(n):
+    n1=random.randint(0,10)
+    n2=random.randint(0,10)
+    out={'n1':n1,'n2':n2}
+    return f'Solve {n1} + {n2}',out
 
 @app.callback(Output('scrapper-results','children'),
               Output('reviews-store','data'),
@@ -55,14 +67,22 @@ app.layout=html.Div([
               Output('scrp-btn','disabled'),
                 [Input('scrp-btn','n_clicks'),
                 State('yelp-url','value'),
-                State('n-pages','value')])
-def get_results(n_clicks,url,n_pages):
+                State('n-pages','value'),
+                State('captcha','value'),
+                State('captcha-gen','data')])
+def get_results(n_clicks,url,n_pages,captcha_result,captcha_gen):
 
      rew_output=""
      dummy_out=''
      reviews=pd.DataFrame()
      btn_state=False
-     if 'scrp-btn'==ctx.triggered_id:
+     if captcha_gen is None:
+        captcha_gen={'n1':-50,'n2':0}
+     captcha_sum=captcha_gen['n1']+captcha_gen['n2']
+     if captcha_result is None:
+        captcha_result=-9999
+     print(captcha_result,captcha_sum)
+     if 'scrp-btn'==ctx.triggered_id and captcha_sum==int(captcha_result):
         #print(url,n_pages)
         n_pages=int(n_pages)
         
@@ -96,10 +116,13 @@ def get_results(n_clicks,url,n_pages):
 
 
                 )
-            rew_output=[html.P(' Select rows and you will get some insights.'),html.P("If results don't appear, probably we're blocked by yelp. Just wait some minutes",style={'width':'50%'}),reviews_data_table]
+            rew_output=[html.P(' Select rows and you will get some insights.'),html.P("If results don't appear, probably we're blocked due to high usage. Just wait some minutes",style={'width':'50%'}),reviews_data_table]
             btn_state=False
-        except:
-            rew_output="something's wrong, make sure this is a yelp link or we have to wait a little bit."
+        except Exception as e:
+            print(e)
+            rew_output="something's wrong, make sure this is a yelp link,check captcha or we have to wait a little bit due to high usage."
+     else:
+        rew_output="something's wrong, make sure this is a yelp link,check captcha or we have to wait a little bit due to high usage."
 
 
 
