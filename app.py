@@ -76,6 +76,7 @@ def get_results(n_clicks,url,n_pages):
                 res=scrapper.multi_pages(url,n_pages)
             
             reviews=scrapper.create_yelp_df(res)
+            print(reviews)
 
             reviews_data_table=dash_table.DataTable(
                                     id={'type':'datatable','index':'reviews-table'},
