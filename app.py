@@ -116,7 +116,7 @@ def get_results(n_clicks,url,n_pages,captcha_result,captcha_gen):
 
 
                 )
-            rew_output=[html.P(' Select rows and you will get some insights.'),html.P("If results don't appear, probably we're blocked due to high usage. Just wait some minutes",style={'width':'50%'}),reviews_data_table]
+            rew_output=[html.P(' Select rows and you will get some insights.'),html.P("If results don't appear,check your captcha or probably we're blocked due to high usage. Just wait some minutes",style={'width':'50%'}),reviews_data_table]
             btn_state=False
         except Exception as e:
             print(e)
