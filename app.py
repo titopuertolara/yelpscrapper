@@ -96,8 +96,8 @@ def get_results(n_clicks,url,n_pages):
 
 
                 )
-            rew_output=[html.P(' Select rows and you will get some insights.'),html.P('if you want to scrape again, refresh the page. Button has been disabled trying to avoid external blocking)',style={'width':'50%'}),reviews_data_table]
-            btn_state=True
+            rew_output=[html.P(' Select rows and you will get some insights.'),html.P("If results don't appear, probably we're blocked by yelp. Just wait some minutes",style={'width':'50%'}),reviews_data_table]
+            btn_state=False
         except:
             rew_output="something's wrong, make sure this is a yelp link or we have to wait a little bit."
 
