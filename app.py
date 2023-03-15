@@ -164,4 +164,4 @@ def show_insights(table_index,stored_reviews):
 
 
 if __name__=='__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
