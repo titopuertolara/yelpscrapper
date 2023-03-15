@@ -121,8 +121,10 @@ def get_results(n_clicks,url,n_pages,captcha_result,captcha_gen):
         except Exception as e:
             print(e)
             rew_output="something's wrong, make sure this is a yelp link,check captcha or we have to wait a little bit due to high usage."
+     elif captcha_sum!=int(captcha_result):
+        rew_output="Check captcha"
      else:
-        rew_output="something's wrong, make sure this is a yelp link,check captcha or we have to wait a little bit due to high usage."
+        rew_output=""
 
 
 
